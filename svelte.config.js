@@ -19,7 +19,12 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter({
 			fallback: 'index.html'
-		})
+		}),
+		// GitHub Pages serves from /<repo-name>/ — this ensures all asset URLs are correct.
+		// For local dev or other hosting, remove this or set to ''.
+		paths: {
+			base: process.env.GITHUB_PAGES ? '/jogo-memoria' : ''
+		},
 	}
 };
 
