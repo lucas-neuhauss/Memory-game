@@ -1,11 +1,15 @@
 <script lang="ts">
 	import type { Card } from '$lib/types';
 	import { getEmojiForCard, getImageForCard } from '$lib/themes';
+	import { base } from '$app/paths';
 
 	let { card, disabled, onclick }: { card: Card; disabled: boolean; onclick: () => void } = $props();
 
 	let emoji = $derived(getEmojiForCard(card.theme, card.pairId));
-	let image = $derived(getImageForCard(card.theme, card.pairId));
+	let imageSrc = $derived.by(() => {
+		const path = getImageForCard(card.theme, card.pairId);
+		return path ? `${base}${path}` : undefined;
+	});
 
 	// Track match transition for celebration animation
 	let justMatched = $state(false);
@@ -54,8 +58,8 @@
 	<div
 		class="card-front absolute inset-0 rounded-xl backface-hidden [transform:rotateY(180deg)] flex items-center justify-center bg-white border-2 border-gray-200 shadow-lg {justMatched ? 'card-front-glow' : ''}"
 	>
-		{#if image}
-			<img src={image} alt={emoji} class="w-full h-full object-contain p-1 sm:p-2" />
+		{#if imageSrc}
+			<img src={imageSrc} alt={emoji} class="w-full h-full object-contain p-1 sm:p-2" />
 		{:else}
 			<span class="text-3xl sm:text-4xl md:text-5xl">{emoji}</span>
 		{/if}
