@@ -220,7 +220,7 @@ export function flipCard(id: string): void {
 				flippedCardIds = [];
 				gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % playerCount;
 				locked = false;
-			}, 800);
+			}, 1300);
 		}
 	}
 }
