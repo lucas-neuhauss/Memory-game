@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getLastMatchEvent } from '$lib/stores/game.svelte';
+	import { clearDeferredMatchEvent, getDeferredMatchEvent } from '$lib/stores/game.svelte';
 
 	const COLORS = ['#fbbf24', '#f472b6', '#60a5fa', '#34d399', '#a78bfa', '#fb923c', '#f87171', '#2dd4bf'];
 
@@ -17,23 +17,43 @@
 	let particles = $state<Particle[]>([]);
 
 	$effect(() => {
-		const event = getLastMatchEvent();
+		const event = getDeferredMatchEvent();
 		if (!event) return;
 
-		const burst: Particle[] = Array.from({ length: 28 }, (_, i) => ({
+		const allParticles: Particle[] = Array.from({ length: 12 }, (_, i) => ({
 			id: event.id + i,
 			x: (Math.random() - 0.5) * 260,
 			y: (Math.random() - 0.5) * 260,
 			color: COLORS[Math.floor(Math.random() * COLORS.length)],
 			size: Math.random() * 8 + 4,
 			rotation: Math.random() * 720 - 360,
-			delay: Math.random() * 0.15,
+			delay: Math.random() * 0.1,
 			shape: (['circle', 'square', 'triangle'] as const)[Math.floor(Math.random() * 3)]
 		}));
 
-		particles = burst;
+		// Batch: create 4 particles per rAF across 3 frames
+		let frame = 0;
+		const batchSize = 4;
+
+		function addBatch() {
+			const start = frame * batchSize;
+			const batch = allParticles.slice(start, start + batchSize);
+			if (batch.length === 0) return;
+
+			particles = [...particles, ...batch];
+			frame++;
+
+			if (frame * batchSize < allParticles.length) {
+				requestAnimationFrame(addBatch);
+			}
+		}
+
+		particles = [];
+		requestAnimationFrame(addBatch);
+
 		setTimeout(() => {
 			particles = [];
+			clearDeferredMatchEvent();
 		}, 1100);
 	});
 </script>

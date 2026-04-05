@@ -9,7 +9,7 @@
 </script>
 
 <div
-	class="grid gap-2 sm:gap-3 w-full max-w-2xl mx-auto"
+	class="game-board grid gap-2 sm:gap-3 w-full max-w-2xl mx-auto"
 	style="grid-template-columns: repeat({gridX}, 1fr);"
 >
 	{#each cards as card (card.id)}

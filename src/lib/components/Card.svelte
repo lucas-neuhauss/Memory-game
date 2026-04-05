@@ -80,8 +80,6 @@
     {#if justMatched}
       <span class="match-star match-star-1">✦</span>
       <span class="match-star match-star-2">✦</span>
-      <span class="match-star match-star-3">✦</span>
-      <span class="match-star match-star-4">✦</span>
     {/if}
   </div>
 </button>
@@ -149,6 +147,8 @@
     position: absolute;
     color: #fbbf24;
     font-size: 0.75rem;
+    will-change: transform, opacity;
+    contain: layout style paint;
     animation: star-burst 0.6s ease-out forwards;
     pointer-events: none;
   }
@@ -167,22 +167,6 @@
     animation-delay: 0.05s;
     --star-x: 0px;
     --star-y: 18px;
-  }
-
-  .match-star-3 {
-    top: 50%;
-    left: -2px;
-    animation-delay: 0.1s;
-    --star-x: -18px;
-    --star-y: 0px;
-  }
-
-  .match-star-4 {
-    top: 50%;
-    right: -2px;
-    animation-delay: 0.15s;
-    --star-x: 18px;
-    --star-y: 0px;
   }
 
   @keyframes star-burst {

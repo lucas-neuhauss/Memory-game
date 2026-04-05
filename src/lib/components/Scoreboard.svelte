@@ -63,24 +63,50 @@
 </div>
 
 <style>
+	.player-card {
+		contain: layout style paint;
+	}
+
 	.player-scored {
 		animation: card-flash 0.5s ease-out;
 	}
 
 	@keyframes card-flash {
 		0% {
-			box-shadow: 0 0 0 rgba(251, 191, 36, 0);
 			border-color: transparent;
 		}
 		30% {
-			box-shadow:
-				0 0 20px rgba(251, 191, 36, 0.6),
-				0 0 40px rgba(251, 191, 36, 0.3);
 			border-color: #fbbf24;
 		}
 		100% {
-			box-shadow: 0 0 0 rgba(251, 191, 36, 0);
 			border-color: transparent;
+		}
+	}
+
+	/* GPU-compositable glow via ::after pseudo-element */
+	.player-scored::after {
+		content: '';
+		position: absolute;
+		inset: -4px;
+		border-radius: inherit;
+		background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, transparent 70%);
+		will-change: transform, opacity;
+		animation: glow-layer 0.5s ease-out forwards;
+		pointer-events: none;
+	}
+
+	@keyframes glow-layer {
+		0% {
+			opacity: 0;
+			transform: scale(0.8);
+		}
+		30% {
+			opacity: 1;
+			transform: scale(1.1);
+		}
+		100% {
+			opacity: 0;
+			transform: scale(1.15);
 		}
 	}
 

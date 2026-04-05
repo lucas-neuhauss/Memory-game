@@ -76,6 +76,7 @@ let flippedCardIds = $state<string[]>([]);
 let locked = $state(false);
 let hydrated = false;
 let lastMatchEvent = $state<{ cardIds: string[]; playerIndex: number; id: number } | null>(null);
+let deferredMatchEvent = $state<{ cardIds: string[]; playerIndex: number; id: number } | null>(null);
 
 /** Hydrate from localStorage — call once from a component's $effect */
 export function hydrateFromStorage(): void {
@@ -124,6 +125,16 @@ export function isLocked(): boolean {
 
 export function getLastMatchEvent() {
 	return lastMatchEvent;
+}
+
+/** Deferred event used by confetti & star animations (fired ~90ms after match) */
+export function getDeferredMatchEvent() {
+	return deferredMatchEvent;
+}
+
+/** Clear the deferred match event after it has been consumed */
+export function clearDeferredMatchEvent(): void {
+	deferredMatchEvent = null;
 }
 
 export function isGameOver(): boolean {
@@ -197,15 +208,27 @@ export function flipCard(id: string): void {
 			// Match!
 			firstCard.matched = true;
 			secondCard.matched = true;
+
+			// Phase 0: immediate — card match state + scoreboard bump
+			const eventId = Date.now();
 			lastMatchEvent = {
 				cardIds: [firstId, secondId],
 				playerIndex: gameState.currentPlayerIndex,
-				id: Date.now()
+				id: eventId
 			};
 			// Increment current player's score
 			gameState.config.players[gameState.currentPlayerIndex].score++;
 			flippedCardIds = [];
 			locked = false;
+
+			// Phase 1: deferred — confetti + star animations (~90ms later)
+			setTimeout(() => {
+				deferredMatchEvent = {
+					cardIds: [firstId, secondId],
+					playerIndex: gameState.currentPlayerIndex,
+					id: eventId
+				};
+			}, 90);
 
 			// Check game over
 			if (gameState.cards.every((c) => c.matched)) {
@@ -230,6 +253,7 @@ export function resetGame(): void {
 	flippedCardIds = [];
 	locked = false;
 	lastMatchEvent = null;
+	deferredMatchEvent = null;
 }
 
 export function restartGame(): void {
